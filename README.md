@@ -189,33 +189,69 @@ The `geolocation` and `product_category_translation` tables are included in the 
 
 ## Key Findings
 
-The analysis identified several notable patterns in the dataset.
+## Key Findings
 
-### Overall Sales
+The analysis identified several patterns across sales performance, customer behaviour, seller activity, and delivery outcomes.
 
-- Total item revenue was approximately **13.59 million**.
-- The dataset contains **99,441 orders**.
-- There are **96,096 unique customers**.
-- Average order value was approximately **137.75**, based on item price.
+### Sales Performance
+
+- The dataset contains **99,441 orders** and generates approximately **13.59M in product revenue**, based on item prices and excluding freight charges.
+- The average revenue per order is approximately **137.75**, calculated from product prices across distinct orders.
+- Revenue varies substantially across product categories, with a relatively small number of categories contributing a large share of overall product revenue.
+- Monthly revenue analysis shows changes in sales activity over the observation period, providing a basis for identifying periods of stronger and weaker commercial performance.
 
 ### Customer Behaviour
 
-- **2,997 unique customer identities** were associated with more than one customer record.
-- The analysis separates one-time and repeat customers to examine differences in customer contribution to revenue.
-
-### Product & Seller Performance
-
-Revenue is distributed unevenly across product categories and sellers. The analysis identifies the highest-revenue products, categories, and sellers for further business investigation.
+- The dataset contains **96,096 unique customer identities**.
+- **2,997 customer identities** are associated with more than one customer record/order, while **93,099** appear as one-time customers.
+- This indicates that the dataset is characterised primarily by one-time purchasing behaviour, highlighting the potential importance of customer retention and repeat-purchase strategies.
+- Revenue analysis by customer type shows that one-time customers account for approximately **94.27% of product revenue**, while repeat customers account for approximately **5.73%**.
+- Customer-level analysis uses `customer_unique_id` to distinguish customer identities from the `customer_id` records associated with individual orders.
 
 ### Delivery Performance
 
-Delivery data was analysed by comparing actual delivery dates with estimated delivery dates. This allows late deliveries to be identified and compared across customer states.
+- Among orders with recorded customer delivery dates, **88,649 were delivered on time and 7,827 were delivered after the estimated delivery date**.
+- The analysis therefore covers **96,476 delivered orders** with sufficient information to classify delivery performance. Orders without a recorded customer delivery date are excluded from this comparison.
+- Average delivery time from purchase to customer delivery was approximately **12.5 days**.
+- Late delivery patterns were also examined by customer state to identify geographic differences in delivery performance.
 
-### Customer Reviews
+### Customer Reviews and Delivery
 
-The project also examines the relationship between delivery performance and review scores.
+- Orders delivered on time received an average review score of approximately **4.29**, compared with **2.57** for orders classified as late.
+- This shows a clear **association between delivery performance and review scores within the dataset**.
+- The analysis does not establish that late delivery directly causes lower review scores, as other factors may also influence customer satisfaction.
 
-These results describe observed patterns in the dataset and do not establish causal relationships.
+### Product and Category Performance
+
+- Product-level analysis identifies the highest-revenue products and the top revenue-generating products within each product category.
+- Category-level analysis compares both revenue contribution and average revenue per order containing each category.
+- Product categories were also compared based on their associated average review scores. Because Olist reviews are recorded at the order level, these results should be interpreted as **average review scores for orders associated with a category**, rather than direct product-level satisfaction scores.
+- Revenue contribution analysis provides a view of how individual product categories contribute to total product revenue.
+
+### Seller Performance
+
+- Seller-level analysis identifies the highest-revenue sellers based on product sales.
+- A separate analysis examines sellers with relatively high order volumes but lower total product revenue, providing a way to identify sellers whose sales volume and revenue generation differ substantially.
+
+### Business Implications
+
+The findings provide several areas for further business investigation:
+
+1. **Customer retention:** The high proportion of one-time customers suggests that repeat-purchase behaviour is an important area for further analysis.
+2. **Delivery performance:** The difference in review scores between late and on-time orders indicates that delivery performance is closely associated with the customer experience in this dataset.
+3. **Category concentration:** Revenue contribution analysis can help identify categories that represent a substantial proportion of overall sales.
+4. **Seller performance:** Comparing order volume with revenue can highlight differences in seller sales profiles and potential opportunities for further investigation.
+5. **Geographic performance:** Customer-state and delivery analysis can support further investigation of regional differences in sales and fulfilment outcomes.
+
+### Analytical Notes and Limitations
+
+- **Revenue definition:** Revenue in this project refers to the `price` field from `order_items` and therefore excludes freight charges.
+- **Customer definition:** `customer_unique_id` is used when analysing unique customer identities, while `customer_id` represents the customer record associated with an order.
+- **Delivery analysis:** On-time and late delivery comparisons include only orders with a recorded customer delivery date.
+- **Review analysis:** Olist reviews are associated with orders rather than individual order items. Category-level review analysis therefore uses distinct order-category combinations to avoid artificially duplicating review records when an order contains multiple items.
+- **Association vs causation:** Relationships between delivery performance and review scores are observational associations and should not be interpreted as causal effects.
+- **Product categories:** The source dataset contains two product categories without English translations. The original category names are retained rather than manually assigning translations.
+- **Historical dataset:** The analysis is based on the Olist Brazilian E-Commerce Public Dataset and reflects the period covered by the source data rather than current e-commerce performance.
 
 ## Project Structure
 
