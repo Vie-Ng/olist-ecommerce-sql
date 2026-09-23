@@ -1,27 +1,41 @@
+/*
+=========================================================
+OLIST BRAZILIAN E-COMMERCE PROJECT
+BUSINESS ANALYSIS
+PostgreSQL
+
+File: 03_business_analysis.sql
+=========================================================
+*/
+
+
 -- Analysis 1: Total Revenue
+-- Business question: What is the total revenue generated from product sales?
+
 SELECT
     SUM(price) AS total_revenue
 FROM order_items;
--- Result: 13,591,643.70
-
 
 
 -- Analysis 2: Total Orders
+-- Business question: How many orders were placed in total?
+
 SELECT
     COUNT(order_id) AS total_orders
 FROM orders;
---Result: 99441
 
 
+-- Analysis 3: Unique Customers
+-- Business question: How many unique customers have placed orders?
 
---Analysis 3: Unique Customers
-SELECT COUNT(DISTINCT(customer_unique_id)) AS unique_customers
-FROM customers
---Result: 96096
+SELECT
+    COUNT(DISTINCT customer_unique_id) AS unique_customers
+FROM customers;
 
 
+-- Analysis 4: Repeat Customers
+-- Business question: Which customers have placed more than one order?
 
---Analysis 4: Repeat Customers
 SELECT
     customer_unique_id,
     COUNT(customer_id) AS order_count
@@ -30,16 +44,18 @@ GROUP BY customer_unique_id
 HAVING COUNT(customer_id) > 1;
 
 
+-- Analysis 5: Number of Repeat Customers
+-- Business question: How many customers have placed more than one order?
 
---Analysis 5: Number of repeat customers
-SELECT 
-COUNT(*) AS repeat_customers
-FROM (SELECT customer_unique_id FROM customers
-GROUP BY customer_unique_id
-HAVING COUNT(customer_id)>1)
-AS repeat_customers_list;
---Result: 2997
-
+SELECT
+    COUNT(*) AS repeat_customers
+FROM (
+    SELECT
+        customer_unique_id
+    FROM customers
+    GROUP BY customer_unique_id
+    HAVING COUNT(customer_id) > 1
+) AS repeat_customers_list;
 
 
 -- Analysis 6: Top 10 Products by Revenue
@@ -54,19 +70,22 @@ ORDER BY total_revenue DESC
 LIMIT 10;
 
 
-
 -- Analysis 7: Revenue by Product Category
 -- Business question: Which product categories generate the most revenue?
-SELECT product_category_name, SUM(price) AS total_revenue 
+
+SELECT
+    product_category_name,
+    SUM(price) AS total_revenue
 FROM order_items
-JOIN products ON order_items.product_id = products.product_id
+JOIN products
+    ON order_items.product_id = products.product_id
 GROUP BY product_category_name
 ORDER BY total_revenue DESC;
 
 
-
 -- Analysis 8: Monthly Revenue Trend
 -- Business question: How did revenue change over time?
+
 SELECT
     DATE_TRUNC('month', orders.order_purchase_timestamp) AS order_month,
     SUM(order_items.price) AS monthly_revenue
@@ -77,19 +96,17 @@ GROUP BY DATE_TRUNC('month', orders.order_purchase_timestamp)
 ORDER BY order_month;
 
 
-
 -- Analysis 9: Average Order Value
--- Business question: What is the average revenue per order?
+-- Business question: What is the average revenue generated per order?
 
 SELECT
     SUM(price) / COUNT(DISTINCT(order_id)) AS average_order_value
 FROM order_items;
---Result: 137.75
 
 
+-- Analysis 10: One-time vs Repeat Customers
+-- Business question: What proportion of customers are one-time versus repeat customers?
 
--- Analysis 11: One-time vs Repeat Customers
--- Business question: How much revenue comes from one-time vs repeat customers?
 SELECT
     CASE
         WHEN order_count = 1 THEN 'One-time customer'
@@ -104,12 +121,11 @@ FROM (
     GROUP BY customer_unique_id
 ) AS customer_orders
 GROUP BY customer_type;
---Result: repeat_2997, onetime: 93099
-
 
 
 -- Analysis 11: Revenue by Customer Type
--- Business question: How much revenue comes from one-time vs repeat customers?
+-- Business question: How much revenue comes from one-time versus repeat customers?
+
 SELECT
     CASE
         WHEN co.order_count = 1 THEN 'One-time customer'
@@ -132,21 +148,24 @@ JOIN order_items oi
 GROUP BY customer_type;
 
 
+-- Analysis 12: Revenue by Customer State
+-- Business question: Which customer states generate the most revenue?
 
---Analysis 12: Revenue by Customer State
-SELECT customer_state, SUM(price) AS total_revenue
+SELECT
+    customer_state,
+    SUM(price) AS total_revenue
 FROM customers
 JOIN orders
-ON customers.customer_id = orders.customer_id
+    ON customers.customer_id = orders.customer_id
 JOIN order_items
-ON orders.order_id = order_items.order_id
+    ON orders.order_id = order_items.order_id
 GROUP BY customer_state
 ORDER BY total_revenue DESC;
 
 
-
 -- Analysis 13: Top 10 Sellers by Revenue
 -- Business question: Which sellers generate the most revenue?
+
 SELECT
     seller_id,
     SUM(price) AS total_revenue
@@ -156,9 +175,9 @@ ORDER BY total_revenue DESC
 LIMIT 10;
 
 
-
 -- Analysis 14: High-Volume but Low-Revenue Sellers
 -- Business question: Which sellers have many orders but relatively low revenue?
+
 SELECT
     seller_id,
     COUNT(DISTINCT order_id) AS number_of_orders,
@@ -170,9 +189,9 @@ HAVING COUNT(DISTINCT order_id) >= 100
 ORDER BY total_revenue ASC;
 
 
-
 -- Analysis 15: Category Revenue and Average Order Value
--- Business question: Which categories generate high revenue and what is their AOV?
+-- Business question: Which product categories generate high revenue and what is their average order value?
+
 SELECT
     p.product_category_name,
     SUM(oi.price) AS total_revenue,
@@ -184,9 +203,9 @@ GROUP BY p.product_category_name
 ORDER BY total_revenue DESC;
 
 
-
-
 -- Analysis 16: On-time vs Late Delivery
+-- Business question: How many orders were delivered on time versus late?
+
 SELECT
     CASE
         WHEN order_delivered_customer_date > order_estimated_delivery_date
@@ -197,13 +216,11 @@ SELECT
 FROM orders
 WHERE order_delivered_customer_date IS NOT NULL
 GROUP BY delivery_status;
---Result: late: 7827, on-time: 88649
-
-
 
 
 -- Analysis 17: Average Delivery Time
 -- Business question: What is the average delivery time in days?
+
 SELECT
     AVG(
         EXTRACT(
@@ -215,8 +232,6 @@ SELECT
 FROM orders
 WHERE order_delivered_customer_date IS NOT NULL
   AND order_purchase_timestamp IS NOT NULL;
-  --Result: 12.5
-
 
 
 -- Analysis 18: Late Delivery by Customer State
@@ -234,27 +249,32 @@ GROUP BY c.customer_state
 ORDER BY late_orders DESC;
 
 
-
 -- Analysis 19: Average Review Score by Product Category
 -- Business question: Which product categories have higher or lower average review scores?
 
+WITH order_category AS (
+    SELECT DISTINCT
+        o.order_id,
+        p.product_category_name
+    FROM orders o
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+    JOIN products p
+        ON oi.product_id = p.product_id
+)
+
 SELECT
-    p.product_category_name,
+    oc.product_category_name,
     ROUND(AVG(r.review_score), 2) AS average_review_score
-FROM order_reviews r
-JOIN orders o
-    ON r.order_id = o.order_id
-JOIN order_items oi
-    ON o.order_id = oi.order_id
-JOIN products p
-    ON oi.product_id = p.product_id
-GROUP BY p.product_category_name
+FROM order_category oc
+JOIN order_reviews r
+    ON oc.order_id = r.order_id
+GROUP BY oc.product_category_name
 ORDER BY average_review_score DESC;
 
 
-
 -- Analysis 20: Review Score vs Delivery Performance
--- Business question: Does late delivery relate to lower review scores?
+-- Business question: Is late delivery associated with lower review scores?
 
 SELECT
     CASE
@@ -270,12 +290,10 @@ JOIN order_reviews r
 WHERE o.order_delivered_customer_date IS NOT NULL
 GROUP BY delivery_status
 ORDER BY average_review_score DESC;
---Result: review on time: 4.29, late: 2.57
-
 
 
 -- Analysis 21: Top 3 Products by Revenue within Each Category
--- Business question: What are the top 3 products by revenue within each category?
+-- Business question: What are the top 3 revenue-generating products within each category?
 
 WITH product_revenue AS (
     SELECT
@@ -314,9 +332,8 @@ ORDER BY
     product_rank;
 
 
-
 -- Analysis 22: Revenue Contribution by Product Category
--- Business question: What percentage of total revenue does each category contribute?
+-- Business question: What percentage of total revenue does each product category contribute?
 
 WITH category_revenue AS (
     SELECT
@@ -337,17 +354,3 @@ SELECT
     ) AS revenue_contribution_pct
 FROM category_revenue
 ORDER BY total_revenue DESC;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
