@@ -83,33 +83,6 @@ This project demonstrates practical SQL techniques including:
 
 ## Database Structure
 
-The PostgreSQL database contains nine main tables:
-
-```text
-customers
-    │
-    └── orders
-          │
-          ├── order_items ── products
-          │                 └── sellers
-          │
-          ├── order_payments
-          │
-          └── order_reviews
-
-products
-    │
-    └── product_category_translation
-
-geolocation
-```
-
-The database was designed using primary keys and foreign keys where appropriate.
-
-The `order_reviews` table uses a composite primary key of `(review_id, order_id)` based on the structure of the source data.
-
-## Database Structure
-
 The PostgreSQL database contains nine main tables.
 
 ```mermaid
