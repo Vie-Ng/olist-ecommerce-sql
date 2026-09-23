@@ -108,6 +108,112 @@ The database was designed using primary keys and foreign keys where appropriate.
 
 The `order_reviews` table uses a composite primary key of `(review_id, order_id)` based on the structure of the source data.
 
+## Database Structure
+
+The PostgreSQL database contains nine main tables.
+
+```mermaid
+erDiagram
+
+    CUSTOMERS ||--o{ ORDERS : "has"
+
+    ORDERS ||--o{ ORDER_ITEMS : "contains"
+    ORDERS ||--o{ ORDER_PAYMENTS : "has"
+    ORDERS ||--o{ ORDER_REVIEWS : "receives"
+
+    PRODUCTS ||--o{ ORDER_ITEMS : "included in"
+    SELLERS ||--o{ ORDER_ITEMS : "fulfills"
+
+    CUSTOMERS {
+        VARCHAR customer_id PK
+        VARCHAR customer_unique_id
+        INTEGER customer_zip_code_prefix
+        VARCHAR customer_city
+        VARCHAR customer_state
+    }
+
+    ORDERS {
+        VARCHAR order_id PK
+        VARCHAR customer_id FK
+        VARCHAR order_status
+        TIMESTAMP order_purchase_timestamp
+        TIMESTAMP order_approved_at
+        TIMESTAMP order_delivered_carrier_date
+        TIMESTAMP order_delivered_customer_date
+        TIMESTAMP order_estimated_delivery_date
+    }
+
+    ORDER_ITEMS {
+        VARCHAR order_id PK, FK
+        INTEGER order_item_id PK
+        VARCHAR product_id FK
+        VARCHAR seller_id FK
+        TIMESTAMP shipping_limit_date
+        NUMERIC price
+        NUMERIC freight_value
+    }
+
+    ORDER_PAYMENTS {
+        VARCHAR order_id PK, FK
+        INTEGER payment_sequential PK
+        VARCHAR payment_type
+        INTEGER payment_installments
+        NUMERIC payment_value
+    }
+
+    ORDER_REVIEWS {
+        VARCHAR review_id PK
+        VARCHAR order_id PK, FK
+        INTEGER review_score
+        TEXT review_comment_title
+        TEXT review_comment_message
+        TIMESTAMP review_creation_date
+        TIMESTAMP review_answer_timestamp
+    }
+
+    PRODUCTS {
+        VARCHAR product_id PK
+        VARCHAR product_category_name
+        INTEGER product_name_length
+        INTEGER product_description_length
+        INTEGER product_photos_qty
+        INTEGER product_weight_g
+        INTEGER product_length_cm
+        INTEGER product_height_cm
+        INTEGER product_width_cm
+    }
+
+    SELLERS {
+        VARCHAR seller_id PK
+        INTEGER seller_zip_code_prefix
+        VARCHAR seller_city
+        VARCHAR seller_state
+    }
+
+    GEOLOCATION {
+        INTEGER geolocation_zip_code_prefix
+        NUMERIC geolocation_lat
+        NUMERIC geolocation_lng
+        VARCHAR geolocation_city
+        VARCHAR geolocation_state
+    }
+
+    PRODUCT_CATEGORY_TRANSLATION {
+        VARCHAR product_category_name PK
+        VARCHAR product_category_name_english
+    }
+```
+
+The database was designed using primary keys and foreign keys where appropriate.
+
+The `order_items` table uses a composite primary key of `(order_id, order_item_id)`.
+
+The `order_payments` table uses a composite primary key of `(order_id, payment_sequential)`.
+
+The `order_reviews` table uses a composite primary key of `(review_id, order_id)` based on the structure of the source data.
+
+The `geolocation` and `product_category_translation` tables are included in the database but do not currently have direct foreign key relationships to other tables.
+
 ## Key Findings
 
 The analysis identified several notable patterns in the dataset.
