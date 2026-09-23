@@ -253,6 +253,46 @@ The findings provide several areas for further business investigation:
 - **Product categories:** The source dataset contains two product categories without English translations. The original category names are retained rather than manually assigning translations.
 - **Historical dataset:** The analysis is based on the Olist Brazilian E-Commerce Public Dataset and reflects the period covered by the source data rather than current e-commerce performance.
 
+## Selected Analysis Results
+
+The SQL analysis was used to investigate several business areas, including sales performance, customer behaviour, delivery performance, and customer satisfaction.
+
+### Sales Performance
+
+| Metric | Result |
+|---|---:|
+| Total orders | 99,441 |
+| Unique customers | 96,096 |
+| Total product revenue | 13.59M |
+| Average order value | 137.75 |
+
+### Customer Behaviour
+
+| Metric | Result |
+|---|---:|
+| One-time customers | 93,099 |
+| Repeat customers | 2,997 |
+| One-time customer share | 96.9% |
+| Repeat customer share | 3.1% |
+
+### Delivery Performance
+
+| Delivery status | Orders |
+|---|---:|
+| On time | 88,649 |
+| Late | 7,827 |
+
+Average delivery time was approximately **12.5 days** among orders with a recorded customer delivery date.
+
+### Customer Reviews
+
+| Delivery status | Average review score |
+|---|---:|
+| On time | 4.29 |
+| Late | 2.57 |
+
+The results show a substantial difference in average review scores between orders delivered on time and orders delivered late. This represents an observed association in the dataset rather than evidence of a causal relationship.
+
 ## Project Structure
 
 ```text
